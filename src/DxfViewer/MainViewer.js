@@ -19,7 +19,7 @@ if (!container) {
 
   // Configure viewer options
   const options = {
-    clearColor: new THREE.Color("#f0f0f0"),
+    clearColor: new THREE.Color("#555555"),
     colorCorrection: true,
   };
 
