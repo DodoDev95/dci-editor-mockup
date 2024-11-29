@@ -198,9 +198,21 @@ const App = ({}) => {
       ],
     },
   ];
+  useEffect(() => {
+    console.log("dasdas");
+    const script = document.createElement("script");
+    script.src = "/src/DxfViewer/MainViewer.js";
+    script.async = true;
+    script.type = "module";
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
-    <Box display='flex' width='100vw'>
+    <Box display='flex' width='100vw' overflow='hidden'>
       <Box display='flex' bgcolor='#494949'>
         <Box sx={{ bgcolor: "#494949" }} height='100vh'>
           <Box width='240px' bgcolor='#494949' role='presentation'>
@@ -253,8 +265,8 @@ const App = ({}) => {
         {/* Main Content */}
         {/* Image */}
       </Box>
-      <Box display='flex' bgcolor='whitesmoke' width='100%' alignItems='top' justifyContent='center'>
-        <div style={{ width: "1000px", height: "1000px" }} id='MainDxfViewerContainerDntDuplicate'></div>
+      <Box display='flex' bgcolor='whitesmoke' width='100%' alignItems='top' justifyContent='center' overflow='hidden'>
+        <div style={{ width: "100%", height: "100%" }} id='MainDxfViewerContainerDntDuplicate'></div>
       </Box>
       <Box display='column' rowGap={1}>
         <Box p={1} height={500} width={300} bgcolor='#494949'>
