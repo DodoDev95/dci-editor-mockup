@@ -59,35 +59,34 @@ if (!container) {
     .then(() => {
       console.log(viewer.GetBounds());
       viewer.SetView(new THREE.Vector3(-9000, 3000, 0), 30000); // Corrected syntax
-      const scene = viewer.GetScene();
-      camera = viewer.GetCamera(); // Get the camera from the viewer
-      for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 2; j++) {
-          // Add yellow rectangle (plane) to the scene
-          const geometry = new THREE.PlaneGeometry(6000, 6000);
-          const material = new THREE.MeshBasicMaterial({
-            color: 0xffff00,
-            side: THREE.DoubleSide,
-            opacity: 0.5,
-            transparent: true,
-          });
-
-          plane = new THREE.Mesh(geometry, material);
-          plane.position.x -= 3000 + i * 8500;
-          plane.position.y -= 200 - j * 7000;
-          scene.add(plane);
-
-          // Add the plane to clickable objects
-          clickableObjects.push(plane);
-        }
-      }
-
       console.log("DXF loaded successfully");
     })
     .catch((err) => {
       console.error("Error loading DXF:", err);
     });
 
+  const scene = viewer.GetScene();
+  camera = viewer.GetCamera(); // Get the camera from the viewer
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 2; j++) {
+      // Add yellow rectangle (plane) to the scene
+      const geometry = new THREE.PlaneGeometry(6000, 6000);
+      const material = new THREE.MeshBasicMaterial({
+        color: 0xffff00,
+        side: THREE.DoubleSide,
+        opacity: 0.5,
+        transparent: true,
+      });
+
+      plane = new THREE.Mesh(geometry, material);
+      plane.position.x -= 3000 + i * 8500;
+      plane.position.y -= 200 - j * 7000;
+      scene.add(plane);
+
+      // Add the plane to clickable objects
+      clickableObjects.push(plane);
+    }
+  }
   // Click event handler
   const onMouseClick = (event) => {
     if (!camera || clickableObjects.length === 0) return;
