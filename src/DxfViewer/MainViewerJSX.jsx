@@ -75,30 +75,6 @@ const DxfViewerComponent = ({ width, height }) => {
         viewer.SetView(new THREE.Vector3(-9000, 3000, 0), 30000);
         console.log("DXF loaded successfully");
 
-        const scene = viewer.GetScene();
-        camera = viewer.GetCamera();
-
-        for (let i = 0; i < 3; i++) {
-          for (let j = 0; j < 2; j++) {
-            // Add yellow rectangle (plane) to the scene
-            const geometry = new THREE.PlaneGeometry(6000, 6000);
-            const material = new THREE.MeshBasicMaterial({
-              color: 0xffff00,
-              side: THREE.DoubleSide,
-              opacity: 0.5,
-              transparent: true,
-            });
-
-            const plane = new THREE.Mesh(geometry, material);
-            plane.position.x -= 3000 + i * 8500;
-            plane.position.y -= 200 - j * 7000;
-            scene.add(plane);
-
-            // Add the plane to clickable objects
-            clickableObjects.push(plane);
-          }
-        }
-
         // Attach event listeners after viewer is ready
         const canvas = container.querySelector("canvas");
         if (canvas) {
@@ -174,6 +150,30 @@ const DxfViewerComponent = ({ width, height }) => {
       .catch((err) => {
         console.error("Error loading DXF:", err);
       });
+
+    const scene = viewer.GetScene();
+    camera = viewer.GetCamera();
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 2; j++) {
+        // Add yellow rectangle (plane) to the scene
+        const geometry = new THREE.PlaneGeometry(6000, 6000);
+        const material = new THREE.MeshBasicMaterial({
+          color: 0xffff00,
+          side: THREE.DoubleSide,
+          opacity: 0.5,
+          transparent: true,
+        });
+
+        const plane = new THREE.Mesh(geometry, material);
+        plane.position.x -= 3000 + i * 8500;
+        plane.position.y -= 200 - j * 7000;
+        scene.add(plane);
+
+        // Add the plane to clickable objects
+        clickableObjects.push(plane);
+      }
+    }
   }, []); // Empty dependency array to run once on mount
 
   // Handle width and height changes
@@ -189,7 +189,7 @@ const DxfViewerComponent = ({ width, height }) => {
       style={{
         width: "100%",
         height: "100%",
-        backgroundColor: "#f00",
+        backgroundColor: "#D3D3D3",
       }}
     />
   );
