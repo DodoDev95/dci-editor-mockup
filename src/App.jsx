@@ -202,7 +202,7 @@ const App = ({}) => {
     console.log("dasdas");
     const script = document.createElement("script");
     script.src = "/src/DxfViewer/MainViewer.js";
-    script.async = true;
+    script.defer = true;
     script.type = "module";
     document.body.appendChild(script);
 
