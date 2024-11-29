@@ -1,5 +1,16 @@
-import React, { useState } from "react";
-import { Drawer, List, ListItem, ListItemText, ListSubheader, Collapse, Box, Typography, Divider, Paper } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListSubheader,
+  Collapse,
+  Box,
+  Typography,
+  Divider,
+  Paper,
+} from "@mui/material";
 import WhatshotIcon from "@mui/icons-material/Whatshot";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import CameraIcon from "@mui/icons-material/Camera";
@@ -21,21 +32,20 @@ const NestedList = ({ nestedItems, setItemInfo }) => {
   };
 
   return (
-    <List component='div' disablePadding>
+    <List component="div" disablePadding>
       {nestedItems.map((nestedItem, index) => (
         <React.Fragment key={index}>
           <ListItem button onClick={() => toggleNestedOpen(index)} sx={{ pl: 4 }}>
             <ListItemText sx={{ color: "orange" }} primary={nestedItem.title} />
             {open[index] ? <ExpandLess /> : <ExpandMore />}
           </ListItem>
-          <Collapse in={open[index]} timeout='auto' unmountOnExit>
-            <List component='div' disablePadding>
+          <Collapse in={open[index]} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
               {nestedItem.items.map((item, i) => (
                 <ListItem
                   onClick={() => setItemInfo(item)}
                   key={i}
-                  sx={{ pl: 6, cursor: "pointer", bgcolor: "lightgray", "&:hover": { bgcolor: "whitesmoke" } }}
-                >
+                  sx={{ pl: 6, cursor: "pointer", bgcolor: "lightgray", "&:hover": { bgcolor: "whitesmoke" } }}>
                   <ListItemText sx={{ color: "black" }} primary={item} />
                 </ListItem>
               ))}
@@ -57,7 +67,7 @@ const SidebarItem = ({ title, nestedItems, setItemInfo }) => {
         <ListItemText primary={title} />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
-      <Collapse in={open} timeout='auto' unmountOnExit>
+      <Collapse in={open} timeout="auto" unmountOnExit>
         <NestedList nestedItems={nestedItems} setItemInfo={setItemInfo} />
       </Collapse>
     </>
@@ -80,32 +90,43 @@ const App = ({}) => {
       nestedItems: [{ title: "Entrance 1", items: ["Door 1", "Door 2", "Door 3", "Door 4"] }],
     },
   ];
+  useEffect(() => {
+    console.log("dasdas");
+    const script = document.createElement("script");
+    script.src = "/src/DxfViewer/MainViewer.js";
+    script.async = true;
+    script.type = "module";
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
-    <Box display='flex' width='100vw' overflow='hidden'>
-      <Box display='flex' bgcolor='#494949'>
-        <Box sx={{ bgcolor: "#494949" }} height='100vh'>
-          <Box width='240px' bgcolor='#494949' role='presentation'>
+    <Box display="flex" width="100vw" overflow="hidden">
+      <Box display="flex" bgcolor="#494949">
+        <Box sx={{ bgcolor: "#494949" }} height="100vh">
+          <Box width="240px" bgcolor="#494949" role="presentation">
             <List
               sx={{ bgcolor: "#494949", color: "white" }}
               subheader={
-                <ListSubheader sx={{ bgcolor: "#494949", color: "white" }} component='div'>
+                <ListSubheader sx={{ bgcolor: "#494949", color: "white" }} component="div">
                   Explorer
                 </ListSubheader>
-              }
-            >
+              }>
               {sidebarItems.map((item, index) => (
                 <SidebarItem key={index} title={item.title} nestedItems={item.nestedItems} setItemInfo={setItemInfo} />
               ))}
             </List>
           </Box>
-          <Box bgcolor='#494949' flexGrow={1} p={2}>
+          <Box bgcolor="#494949" flexGrow={1} p={2}>
             <Box mb={2}>
-              <Typography color='whitesmoke' variant='body1'>
+              <Typography color="whitesmoke" variant="body1">
                 Draggable Symbols
               </Typography>
               <Divider sx={{ bgcolor: "whitesmoke" }} />
-              <Box display='flex' mt={1} flexWrap='wrap' gap={2}>
+              <Box display="flex" mt={1} flexWrap="wrap" gap={2}>
                 <CameraIcon sx={{ color: "white" }} />
                 <LocalFireDepartmentIcon sx={{ color: "white" }} />
                 <SensorsIcon sx={{ color: "white" }} />
@@ -118,16 +139,14 @@ const App = ({}) => {
         {/* Main Content */}
         {/* Image */}
       </Box>
-      <Box display='flex' bgcolor='whitesmoke' width='100%' alignItems='top' justifyContent='center' overflow='hidden'>
-        <div style={{ width: "100%", height: "100%", backgroundColor: "yellow" }} id='MainDxfViewerContainerDntDuplicate'>
-          fldsakfgldfjhgkdsfhdgh
-        </div>
+      <Box display="flex" bgcolor="whitesmoke" width="100%" alignItems="top" justifyContent="center" overflow="hidden">
+        <div style={{ width: "100%", height: "100%" }} id="MainDxfViewerContainerDntDuplicate"></div>
       </Box>
-      <Box display='column' rowGap={1}>
-        <Box p={1} height={500} width={300} bgcolor='#494949'>
+      <Box display="column" rowGap={1}>
+        <Box p={1} height={500} width={300} bgcolor="#494949">
           <ScrollablePanel />
         </Box>
-        <Box p={1} height={600} width={300} bgcolor='#494949'>
+        <Box p={1} height={600} width={300} bgcolor="#494949">
           <PaperWithTabs tabContent={itemInfo} />
         </Box>
       </Box>

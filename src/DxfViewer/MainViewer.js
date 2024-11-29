@@ -5,6 +5,7 @@ import dxfFloor from "../assets/models/dxf/Izvedeno za DCI 25-11-2024.dxf"; // A
 
 // Create container for viewer
 const container = document.getElementById("MainDxfViewerContainerDntDuplicate");
+console.log("DASDMOASDMOASDOMASDMOADS");
 if (!container) {
   console.error("Container element not found!");
 } else {
