@@ -119,7 +119,9 @@ const App = ({}) => {
         {/* Image */}
       </Box>
       <Box display='flex' bgcolor='whitesmoke' width='100%' alignItems='top' justifyContent='center' overflow='hidden'>
-        <img style={{ position: "relative", bottom: 500 }} src={svg} width='2000px' />
+        <div style={{ width: "100%", height: "100%", backgroundColor: "yellow" }} id='MainDxfViewerContainerDntDuplicate'>
+          fldsakfgldfjhgkdsfhdgh
+        </div>
       </Box>
       <Box display='column' rowGap={1}>
         <Box p={1} height={500} width={300} bgcolor='#494949'>
