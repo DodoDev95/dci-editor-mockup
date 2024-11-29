@@ -5,15 +5,4 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   assetsInclude: ["**/*.dxf"],
-  build: {
-    rollupOptions: {
-      input: {
-        mainViewer: "./src/DxfViewer/MainViewer.js",
-      },
-      output: {
-        entryFileNames: "assets/[name].js",
-        format: "es",
-      },
-    },
-  },
 });
