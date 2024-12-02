@@ -42,7 +42,14 @@ const NestedList = ({ nestedItems, setItemInfo, searchTerm }) => {
 
         return (
           <React.Fragment key={index}>
-            <ListItem button onClick={() => toggleNestedOpen(index)} sx={{ pl: 4 }}>
+            <ListItem
+              button
+              onClick={() => {
+                toggleNestedOpen(index);
+                setItemInfo(nestedItem.title);
+              }}
+              sx={{ pl: 4 }}
+            >
               <ListItemText sx={{ color: "orange" }} primary={nestedItem.title} />
               {open[index] ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
@@ -89,7 +96,14 @@ const NestedList = ({ nestedItems, setItemInfo, searchTerm }) => {
                         // Recursively render nested objects
                         return (
                           <React.Fragment key={i}>
-                            <ListItem button onClick={() => toggleNestedOpen(`${index}-${i}`)} sx={{ pl: 6 }}>
+                            <ListItem
+                              button
+                              onClick={() => {
+                                toggleNestedOpen(`${index}-${i}`);
+                                setItemInfo(child.title);
+                              }}
+                              sx={{ pl: 6 }}
+                            >
                               <ListItemText primary={child.title} />
                               {open[`${index}-${i}`] ? <ExpandLess /> : <ExpandMore />}
                             </ListItem>
@@ -134,7 +148,13 @@ const SidebarItem = ({ title, nestedItems, setItemInfo, searchTerm }) => {
 
   return (
     <>
-      <ListItem button onClick={toggleOpen}>
+      <ListItem
+        button
+        onClick={() => {
+          toggleOpen();
+          setItemInfo(title);
+        }}
+      >
         <ListItemText primary={title} sx={{ color: "lightgreen" }} />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
