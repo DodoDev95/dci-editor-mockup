@@ -58,12 +58,9 @@ const NestedList = ({ nestedItems, setItemInfo, searchTerm }) => {
                 component='div'
                 disablePadding
                 sx={{
-                  maxHeight: "200px", // Approximate height for 5 items
-                  overflowY: "auto", // Enable scrolling
-                  scrollbarWidth: "none", // Hide scrollbars for Firefox
-                  "&::-webkit-scrollbar": {
-                    display: "none", // Hide scrollbars for Chrome, Safari, Edge
-                  },
+                  maxHeight: "200px",
+                  overflowY: "auto",
+                  scrollbarWidth: "thin",
                 }}
               >
                 {nestedItem.items &&
