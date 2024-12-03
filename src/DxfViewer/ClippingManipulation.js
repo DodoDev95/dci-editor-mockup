@@ -3,8 +3,6 @@ import * as THREE from "three";
 import { CSG } from "three-csg-ts";
 class ClippingManipulation {
   static clippingPlane = null;
-  static ViewerBounds = null;
-  static origin = null;
   static CreateClippingPlane(Bounds, origin) {
     const { scene, renderer } = MainViewerUtils;
     //rotate the camera so that i can see depth
@@ -14,6 +12,7 @@ class ClippingManipulation {
       return;
     }
     ClippingManipulation.ViewerBounds = Bounds;
+    console.log(Bounds);
     const { minX, maxX, minY, maxY } = Bounds;
     console.log(Bounds);
     const center = new THREE.Vector3((minX + maxX) / 2, (minY + maxY) / 2, 0);
@@ -36,7 +35,7 @@ class ClippingManipulation {
     const planeMaterial = new THREE.MeshBasicMaterial({
       color: 0xff0000,
       side: THREE.DoubleSide,
-      opacity: 1.0,
+      opacity: 0.4,
       transparent: true,
     });
     const planeGeometry = new THREE.ShapeGeometry(shape);
@@ -48,6 +47,7 @@ class ClippingManipulation {
     ClippingManipulation.ViewerBounds = Bounds;
     ClippingManipulation.origin = origin;
     scene.add(planeMesh);
+    renderer.render(scene, MainViewerUtils.camera);
   }
 
   static ClippingPlaneClick(clickedMesh, clickedPath) {
@@ -135,6 +135,11 @@ class ClippingManipulation {
     // Add the new clipping plane to the scene
     scene.add(subtractedMesh);
     renderer.render(scene, MainViewerUtils.camera);
+  }
+  droppedZone(event) {
+    const droppedZone = ClippingManipulation.clippingPlane;
+    const { scene, renderer } = MainViewerUtils;
+    //make a red circle with radius 200 here
   }
 }
 export default ClippingManipulation;

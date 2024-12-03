@@ -4,6 +4,7 @@ import * as THREE from "three";
 import dxfFloor from "../assets/models/dxf/Izvedeno za DCI 25-11-2024.dxf"; // Adjust the path as needed
 import { MainViewerUtils } from "./MainViewerUtils";
 import AreaClickable from "./AreaClass";
+import ClippingManipulation from "./ClippingManipulation";
 
 const DxfViewerComponent = ({ width, height }) => {
   const containerRef = useRef(null);
@@ -41,6 +42,7 @@ const DxfViewerComponent = ({ width, height }) => {
 
     // Initialize DxfViewer
     const viewer = new DxfViewer(container, options);
+
     viewerRef.current = viewer;
     viewer.SetSize(container.clientWidth, container.clientHeight);
 
@@ -73,7 +75,9 @@ const DxfViewerComponent = ({ width, height }) => {
         },
         workerFactory: null,
       })
-      .then(() => {})
+      .then(() => {
+        ClippingManipulation.CreateClippingPlane(viewer.GetBounds(), viewer.origin);
+      })
       .catch((err) => {
         console.error("Error loading DXF:", err);
       });
@@ -122,6 +126,19 @@ const DxfViewerComponent = ({ width, height }) => {
     }
     const canvas = viewer.GetCanvas();
     if (canvas) {
+      canvas.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+      canvas.addEventListener("dragenter", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+      canvas.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        MainViewerUtils.droppedZone(e);
+      });
       canvas.addEventListener("click", MainViewerUtils.getClickedMesh);
     }
   }, []); // Empty dependency array to run once on mount
@@ -137,7 +154,6 @@ const DxfViewerComponent = ({ width, height }) => {
     <div
       ref={containerRef}
       onDragOver={(e) => e.preventDefault()}
-      onDrop={ondrop}
       style={{
         width: "100%",
         height: "100%",
