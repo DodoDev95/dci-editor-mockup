@@ -15,11 +15,13 @@
     "@mui/icons-material": "^6.1.9",
     "@mui/material": "^6.1.9",
     "dxf-viewer": "^1.0.37",
+    "rbush": "^4.0.1",
     "react": "^18.3.1",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.3.1",
-    "three": "^0.171.0"
+    "three": "^0.171.0",
+    "three-csg-ts": "^3.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",

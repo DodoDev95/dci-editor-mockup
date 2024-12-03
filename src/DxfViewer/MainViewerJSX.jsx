@@ -2,10 +2,19 @@ import React, { useRef, useEffect } from "react";
 import { DxfViewer } from "dxf-viewer";
 import * as THREE from "three";
 import dxfFloor from "../assets/models/dxf/Izvedeno za DCI 25-11-2024.dxf"; // Adjust the path as needed
+import { MainViewerUtils } from "./MainViewerUtils";
+import AreaClickable from "./AreaClass";
 
 const DxfViewerComponent = ({ width, height }) => {
   const containerRef = useRef(null);
   const viewerRef = useRef(null);
+  const ondrop = (e, v) => {
+    e.preventDefault();
+    renderImage(1920, 1080);
+
+    console.log(e, v);
+  };
+  //function to render the image from canvas with the given width and height
 
   useEffect(() => {
     const container = containerRef.current;
@@ -13,13 +22,6 @@ const DxfViewerComponent = ({ width, height }) => {
       console.error("Container element not found!");
       return;
     }
-
-    // Remove the canvas existence check or adjust it as needed
-    // if (container.querySelector("canvas")) {
-    //   console.log("Canvas already exists in the container. Skipping initialization.");
-    //   return;
-    // }
-
     // Declare variables
     if (container.querySelector("canvas")) {
       console.log("Canvas already exists in the container. Skipping initialization.");
@@ -33,6 +35,7 @@ const DxfViewerComponent = ({ width, height }) => {
     // Configure viewer options
     const options = {
       clearColor: new THREE.Color("#D3D3D3"),
+      alpha: true,
       colorCorrection: true,
     };
 
@@ -70,94 +73,33 @@ const DxfViewerComponent = ({ width, height }) => {
         },
         workerFactory: null,
       })
-      .then(() => {
-        console.log(viewer.GetBounds());
-        viewer.SetView(new THREE.Vector3(-9000, 3000, 0), 30000);
-        console.log("DXF loaded successfully");
-
-        // Attach event listeners after viewer is ready
-        const canvas = container.querySelector("canvas");
-        if (canvas) {
-          canvas.addEventListener("click", onMouseClick);
-          canvas.addEventListener("contextmenu", onContextMenu);
-        }
-
-        // Click event handler
-        function onMouseClick(event) {
-          try {
-            if (!camera || clickableObjects.length === 0) return;
-
-            // Calculate mouse position in normalized device coordinates
-            const rect = container.getBoundingClientRect();
-
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-            // Update raycaster with the camera and mouse position
-            raycaster.setFromCamera(mouse, camera);
-
-            // Check intersections with clickable objects
-            const intersects = raycaster.intersectObjects(clickableObjects);
-            console.log("Intersects:", intersects);
-
-            if (intersects.length > 0) {
-              console.log("Clicked on:", intersects[0].object);
-
-              const clickedPlane = intersects[0].object;
-              if (clickedPlane.visible) {
-                clickedPlane.visible = false;
-                const position = clickedPlane.position;
-                clickableObjects.forEach((obj) => (obj.visible = false));
-
-                viewer.SetView(new THREE.Vector3(position.x, position.y, position.z), 6000);
-              }
-            }
-          } catch (error) {
-            console.error("Error in onMouseClick:", error);
-          }
-        }
-
-        // Right-click event handler
-        function onContextMenu(event) {
-          event.preventDefault();
-          clickableObjects.forEach((obj) => (obj.visible = true));
-          viewer.SetView(new THREE.Vector3(-9000, 3000, 0), 30000);
-        }
-
-        // Resize event handler
-        function onWindowResize() {
-          viewer.SetSize(container.clientWidth, container.clientHeight);
-          console.log("Viewer resized");
-        }
-
-        // Add resize event listener
-        window.addEventListener("resize", onWindowResize);
-
-        // Cleanup function
-        return () => {
-          if (canvas) {
-            canvas.removeEventListener("click", onMouseClick);
-            canvas.removeEventListener("contextmenu", onContextMenu);
-          }
-          window.removeEventListener("resize", onWindowResize);
-
-          // Dispose viewer resources if necessary
-          if (viewerRef.current && viewerRef.current.Dispose) {
-            viewerRef.current.Dispose();
-          }
-        };
-      })
+      .then(() => {})
       .catch((err) => {
         console.error("Error loading DXF:", err);
       });
-
     const scene = viewer.GetScene();
     camera = viewer.GetCamera();
+    MainViewerUtils.initialize(viewerRef);
+
+    //mainViewerUtils.screenshot(1920, 1080);
 
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 2; j++) {
-        // Add yellow rectangle (plane) to the scene
-        const geometry = new THREE.PlaneGeometry(6000, 6000);
+        // Create a path to represent the rectangle
+        const path = new THREE.Path();
+        path.moveTo(-i * 9000 - 4500, +j * 6000 - 3500);
+        path.lineTo(-i * 9000 + 4500, +j * 6000 - 3500);
+        path.lineTo(-i * 9000 + 4500, +j * 6000 + 3500);
+        path.lineTo(-i * 9000 - 4500, +j * 6000 + 3500);
+        path.lineTo(-i * 9000 - 4500, +j * 6000 - 3500);
+
+        // Create a shape from the path
+        const shape = new THREE.Shape(path.getPoints());
+
+        // Create geometry from the shape
+        const geometry = new THREE.ShapeGeometry(shape);
+
+        // Create the material
         const material = new THREE.MeshBasicMaterial({
           color: 0xffff00,
           side: THREE.DoubleSide,
@@ -165,14 +107,22 @@ const DxfViewerComponent = ({ width, height }) => {
           transparent: true,
         });
 
-        const plane = new THREE.Mesh(geometry, material);
-        plane.position.x -= 3000 + i * 8500;
-        plane.position.y -= 200 - j * 7000;
-        scene.add(plane);
+        // Create a mesh from the geometry and material
+        const shapeMesh = new THREE.Mesh(geometry, material);
 
-        // Add the plane to clickable objects
-        clickableObjects.push(plane);
+        // Add the mesh to the scene
+        scene.add(shapeMesh);
+
+        // Make it clickable
+        AreaClickable.addClickableObject({
+          mesh: shapeMesh,
+          path: path,
+        });
       }
+    }
+    const canvas = viewer.GetCanvas();
+    if (canvas) {
+      canvas.addEventListener("click", MainViewerUtils.getClickedMesh);
     }
   }, []); // Empty dependency array to run once on mount
 
@@ -186,6 +136,8 @@ const DxfViewerComponent = ({ width, height }) => {
   return (
     <div
       ref={containerRef}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={ondrop}
       style={{
         width: "100%",
         height: "100%",
