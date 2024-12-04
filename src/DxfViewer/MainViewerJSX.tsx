@@ -1,3 +1,5 @@
+// DxfViewerComponent.tsx (modified)
+
 import React, { useRef, useEffect } from "react";
 import { DxfViewer } from "dxf-viewer";
 import * as THREE from "three";
@@ -5,11 +7,16 @@ import dxfFloor from "../assets/models/dxf/Izvedeno za DCI 25-11-2024.dxf";
 import { MainViewerUtils } from "./MainViewerUtils";
 import AreaClickable from "./AreaClass";
 import ClippingManipulation from "./ClippingManipulation";
-import { FloorBuilder } from "./FloorClass"; // Import FloorBuilder
+import { useDispatch, useSelector } from "react-redux";
+import { CREATE_FLOOR, ADD_AREA } from "@types";
+import { Floor, Area } from "@types";
+import { AppState } from "./store";
 
 const DxfViewerComponent = ({ width, height }) => {
   const containerRef = useRef(null);
   const viewerRef = useRef(null);
+  const dispatch = useDispatch();
+  const floorState = useSelector((state: AppState) => state.floorState);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -70,8 +77,16 @@ const DxfViewerComponent = ({ width, height }) => {
 
         const scene = viewer.GetScene();
 
-        // Create the first floor through FloorBuilder
-        const floor = FloorBuilder.createFloor("floor-1", null, scene);
+        // Dispatch action to create the floor
+        const floorId = "floor-1";
+        const floor: Floor = {
+          id: floorId,
+          asset: null,
+          sensors: [],
+          areas: [],
+          subFloors: [],
+        };
+        dispatch({ type: CREATE_FLOOR, payload: { floor } });
 
         // Add areas to the floor
         for (let i = 0; i < 3; i++) {
@@ -84,8 +99,43 @@ const DxfViewerComponent = ({ width, height }) => {
             path.lineTo(-i * 9000 - 4500, +j * 6000 + 3500);
             path.lineTo(-i * 9000 - 4500, +j * 6000 - 3500);
 
-            // Add the area to the floor
-            floor.addArea(path);
+            // Create an area object
+            const areaId = `area-${i}-${j}`;
+            const area: Area = {
+              id: areaId,
+              path: path,
+              floorId: floorId,
+            };
+
+            // Dispatch action to add the area
+            dispatch({ type: ADD_AREA, payload: { area } });
+
+            // Create a shape from the path
+            const shape = new THREE.Shape(path.getPoints());
+
+            // Create geometry from the shape
+            const geometry = new THREE.ShapeGeometry(shape);
+
+            // Create the material
+            const material = new THREE.MeshBasicMaterial({
+              color: 0xffff00,
+              side: THREE.DoubleSide,
+              opacity: 0.5,
+              transparent: true,
+            });
+
+            // Create a mesh from the geometry and material
+            const shapeMesh = new THREE.Mesh(geometry, material);
+
+            // Add the mesh to the scene
+            scene.add(shapeMesh);
+
+            // Make it clickable
+            AreaClickable.addClickableObject({
+              mesh: shapeMesh,
+              path: path,
+              areaId: areaId,
+            });
           }
         }
 
@@ -98,16 +148,6 @@ const DxfViewerComponent = ({ width, height }) => {
 
     const canvas = viewer.GetCanvas();
     if (canvas) {
-      canvas.addEventListener("mousedown", (e) => {
-        console.log("drag");
-        e.preventDefault();
-        e.stopPropagation();
-      });
-      canvas.addEventListener("dragend", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log("dragend");
-      });
       canvas.addEventListener("dragover", (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -119,8 +159,7 @@ const DxfViewerComponent = ({ width, height }) => {
       canvas.addEventListener("drop", (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log("drop", FloorBuilder);
-        MainViewerUtils.droppedZone(e);
+        MainViewerUtils.droppedZone(e, dispatch, floorState);
       });
       canvas.addEventListener("click", MainViewerUtils.getClickedMesh);
     }

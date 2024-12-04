@@ -1,6 +1,6 @@
 // floorReducer.ts
 
-import { FloorsState, FloorActionTypes, CREATE_FLOOR, ADD_SENSOR, ADD_AREA, ADD_SUBFLOOR } from '@Types';
+import { FloorsState, FloorActionTypes, CREATE_FLOOR, ADD_SENSOR, ADD_AREA, ADD_SUBFLOOR } from '@types';
 
 const initialState: FloorsState = {
   floors: {},

@@ -47,57 +47,65 @@ export class MainViewerUtils {
 
     return clickedObject;
   }
-  static droppedZone(event) {
-    // Prevent the default behavior (Prevent the browser from handling the drop)
+  static droppedZone(event, dispatch, floorState) {
     event.preventDefault();
+    event.stopPropagation();
 
-    const droppedZone = ClippingManipulation.clippingPlane;
     const { scene, renderer, camera } = MainViewerUtils;
 
     // Get mouse position in normalized device coordinates (-1 to +1)
     const rect = renderer.domElement.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-    console.log(event);
 
     const mouse = new THREE.Vector2(x, y);
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, camera);
 
-    // Intersect with the clipping plane
-    MainViewerUtils.renderer.render(scene, camera);
-    const intersects = raycaster.intersectObject(droppedZone, true);
-    console.log(droppedZone);
+    // Intersect with clickable objects (areas)
+    const intersects = raycaster.intersectObjects(
+      AreaClickable.array.map((item) => item.mesh),
+      true
+    );
 
     if (intersects.length > 0) {
-      // Get the intersection point
-      const point = intersects[0].point;
+      const intersect = intersects[0];
+      const clickedMesh = intersect.object;
 
-      // Create a red circle geometry
-      const circleRadius = 300; // Radius of the circle
-      const circleSegments = 32; // Number of segments to make it smooth
-      const circleGeometry = new THREE.CircleGeometry(circleRadius, circleSegments);
+      // Find the area that was clicked
+      const clickableObject = AreaClickable.array.find((item) => item.mesh === clickedMesh);
+      if (clickableObject) {
+        const areaId = clickableObject.areaId;
+        const area = floorState.areas[areaId];
+        const floorId = area.floorId;
 
-      // Create a material for the circle
-      const circleMaterial = new THREE.MeshBasicMaterial({
-        color: 0xff0000, // Red color
-        side: THREE.DoubleSide, // Make it visible from both sides
-      });
+        // Get the intersection point
+        const point = intersect.point;
 
-      // Create the mesh
-      const circleMesh = new THREE.Mesh(circleGeometry, circleMaterial);
+        // Create a new sensor at the drop location
+        const sensorId = `sensor-${Date.now()}`;
+        const sensor = {
+          id: sensorId,
+          x: point.x,
+          y: point.y,
+          label: "Dropped Sensor",
+          floorId: floorId,
+        };
 
-      // Position the circle at the intersection point
-      circleMesh.position.copy(point);
+        // Dispatch action to add the sensor
+        dispatch({ type: ADD_SENSOR, payload: { sensor } });
 
-      // Align the circle to the clipping plane's orientation
-      circleMesh.lookAt(circleMesh.position.clone().add(droppedZone.getWorldDirection(new THREE.Vector3())));
+        // Optionally, add visual representation of the sensor
+        const sensorGeometry = new THREE.SphereGeometry(100, 16, 16);
+        const sensorMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const sensorMesh = new THREE.Mesh(sensorGeometry, sensorMaterial);
+        sensorMesh.position.copy(point);
+        scene.add(sensorMesh);
 
-      // Add the circle to the scene
-      scene.add(circleMesh);
-      MainViewerUtils.renderer.render(scene, camera);
+        console.log(`Sensor ${sensorId} added at (${point.x}, ${point.y})`);
+      }
     } else {
-      console.log("No intersection with the clipping plane.");
+      console.log("No intersection with areas.");
     }
   }
 }

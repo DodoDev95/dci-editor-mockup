@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Drawer, List, ListItem, ListItemText, ListSubheader, Collapse, Box, Typography, Divider, Paper, TextField } from "@mui/material";
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListSubheader,
+  Collapse,
+  Box,
+  Typography,
+  Divider,
+  Paper,
+  TextField,
+} from "@mui/material";
 import WhatshotIcon from "@mui/icons-material/Whatshot";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import CameraIcon from "@mui/icons-material/Camera";
@@ -22,7 +34,7 @@ const NestedList = ({ nestedItems, setItemInfo, searchTerm }) => {
   };
 
   return (
-    <List component='div' disablePadding>
+    <List component="div" disablePadding>
       {nestedItems.map((nestedItem, index) => {
         // Check if the current nestedItem or its children match the search term
         const isMatch =
@@ -48,21 +60,19 @@ const NestedList = ({ nestedItems, setItemInfo, searchTerm }) => {
                 toggleNestedOpen(index);
                 setItemInfo(nestedItem.title);
               }}
-              sx={{ pl: 4 }}
-            >
+              sx={{ pl: 4 }}>
               <ListItemText sx={{ color: "orange" }} primary={nestedItem.title} />
               {open[index] ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
-            <Collapse in={open[index] || searchTerm !== ""} timeout='auto' unmountOnExit>
+            <Collapse in={open[index] || searchTerm !== ""} timeout="auto" unmountOnExit>
               <List
-                component='div'
+                component="div"
                 disablePadding
                 sx={{
                   maxHeight: "200px",
                   overflowY: "auto",
                   scrollbarWidth: "thin",
-                }}
-              >
+                }}>
                 {nestedItem.items &&
                   nestedItem.items
                     .filter(
@@ -84,8 +94,7 @@ const NestedList = ({ nestedItems, setItemInfo, searchTerm }) => {
                               cursor: "pointer",
                               bgcolor: "lightgray",
                               "&:hover": { bgcolor: "whitesmoke" },
-                            }}
-                          >
+                            }}>
                             <ListItemText sx={{ color: "black" }} primary={child} />
                           </ListItem>
                         );
@@ -99,12 +108,11 @@ const NestedList = ({ nestedItems, setItemInfo, searchTerm }) => {
                                 toggleNestedOpen(`${index}-${i}`);
                                 setItemInfo(child.title);
                               }}
-                              sx={{ pl: 6 }}
-                            >
+                              sx={{ pl: 6 }}>
                               <ListItemText primary={child.title} />
                               {open[`${index}-${i}`] ? <ExpandLess /> : <ExpandMore />}
                             </ListItem>
-                            <Collapse in={open[`${index}-${i}`]} timeout='auto' unmountOnExit>
+                            <Collapse in={open[`${index}-${i}`]} timeout="auto" unmountOnExit>
                               {Array.isArray(child.items) && typeof child.items[0] === "string" ? (
                                 // If child.items is an array of strings, display them as individual ListItem components
                                 child.items.map((item, j) => (
@@ -116,14 +124,17 @@ const NestedList = ({ nestedItems, setItemInfo, searchTerm }) => {
                                       cursor: "pointer",
                                       bgcolor: "lightgray",
                                       "&:hover": { bgcolor: "whitesmoke" },
-                                    }}
-                                  >
+                                    }}>
                                     <ListItemText sx={{ color: "black" }} primary={item} />
                                   </ListItem>
                                 ))
                               ) : (
                                 // Otherwise, recursively render the NestedList for deeper nesting
-                                <NestedList nestedItems={child.items} setItemInfo={setItemInfo} searchTerm={searchTerm} />
+                                <NestedList
+                                  nestedItems={child.items}
+                                  setItemInfo={setItemInfo}
+                                  searchTerm={searchTerm}
+                                />
                               )}
                             </Collapse>
                           </React.Fragment>
@@ -150,12 +161,11 @@ const SidebarItem = ({ title, nestedItems, setItemInfo, searchTerm }) => {
         onClick={() => {
           toggleOpen();
           setItemInfo(title);
-        }}
-      >
+        }}>
         <ListItemText primary={title} sx={{ color: "lightgreen" }} />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
-      <Collapse in={open || searchTerm !== ""} timeout='auto' unmountOnExit>
+      <Collapse in={open || searchTerm !== ""} timeout="auto" unmountOnExit>
         <NestedList nestedItems={nestedItems} setItemInfo={setItemInfo} searchTerm={searchTerm} />
       </Collapse>
     </>
@@ -239,24 +249,23 @@ const App = ({}) => {
   ];
 
   return (
-    <Box display='flex' width='100vw' overflow='hidden'>
-      <Box display='flex' bgcolor='#494949'>
-        <Box sx={{ bgcolor: "#494949" }} height='100vh'>
-          <Box width='240px' bgcolor='#494949' role='presentation'>
+    <Box display="flex" width="100vw" overflow="hidden">
+      <Box display="flex" bgcolor="#494949">
+        <Box sx={{ bgcolor: "#494949" }} height="100vh">
+          <Box width="240px" bgcolor="#494949" role="presentation">
             <List
               sx={{ bgcolor: "#494949", color: "white" }}
               subheader={
-                <ListSubheader sx={{ bgcolor: "#494949", color: "white" }} component='div'>
+                <ListSubheader sx={{ bgcolor: "#494949", color: "white" }} component="div">
                   Explorer
                 </ListSubheader>
-              }
-            >
+              }>
               {/* Search Field */}
               <Box p={1}>
                 <TextField
                   fullWidth
-                  size='small'
-                  placeholder='Search...'
+                  size="small"
+                  placeholder="Search..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   sx={{
@@ -269,17 +278,23 @@ const App = ({}) => {
 
               {/* Sidebar Items */}
               {sidebarItems.map((item, index) => (
-                <SidebarItem key={index} title={item.title} nestedItems={item.nestedItems} setItemInfo={setItemInfo} searchTerm={searchTerm} />
+                <SidebarItem
+                  key={index}
+                  title={item.title}
+                  nestedItems={item.nestedItems}
+                  setItemInfo={setItemInfo}
+                  searchTerm={searchTerm}
+                />
               ))}
             </List>
           </Box>
-          <Box bgcolor='#494949' flexGrow={1} p={2}>
+          <Box bgcolor="#494949" flexGrow={1} p={2}>
             <Box mb={2}>
-              <Typography color='whitesmoke' variant='body1'>
+              <Typography color="whitesmoke" variant="body1">
                 Draggable Symbols
               </Typography>
               <Divider sx={{ bgcolor: "whitesmoke" }} />
-              <Box display='flex' mt={1} flexWrap='wrap' gap={2}>
+              <Box display="flex" mt={1} flexWrap="wrap" gap={2}>
                 <CameraIcon sx={{ color: "white" }} />
                 <LocalFireDepartmentIcon sx={{ color: "white" }} />
                 <SensorsIcon sx={{ color: "white" }} />
@@ -292,14 +307,14 @@ const App = ({}) => {
         {/* Main Content */}
         {/* Image */}
       </Box>
-      <Box display='flex' bgcolor='whitesmoke' width='100%' alignItems='top' justifyContent='center' overflow='hidden'>
+      <Box display="flex" bgcolor="whitesmoke" width="100%" alignItems="top" justifyContent="center" overflow="hidden">
         <DxfViewerComponent height={500} width={500} />
       </Box>
-      <Box display='column' rowGap={1}>
-        <Box p={1} height={500} width={300} bgcolor='#494949'>
+      <Box display="column" rowGap={1}>
+        <Box p={1} height={500} width={300} bgcolor="#494949">
           <ScrollablePanel />
         </Box>
-        <Box p={1} height={600} width={300} bgcolor='#494949'>
+        <Box p={1} height={600} width={300} bgcolor="#494949">
           <PaperWithTabs tabContent={itemInfo} />
         </Box>
       </Box>

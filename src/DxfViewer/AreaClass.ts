@@ -1,18 +1,19 @@
 import RBush from "rbush";
 import * as THREE from "three";
+import { Area } from "@types";
 
 class AreaClickable {
-  static array = new Array();
+  static array: Area[] = [];
 
-  static addClickableObject(obj) {
-    // The object should have minX, minY, maxX, maxY properties and a mesh
+  static addClickableObject(obj: Area) {
+    // The object should have mesh and path properties
     AreaClickable.array.push({
       mesh: obj.mesh,
       path: obj.path,
     });
   }
 
-  static getClickedObject(x, y, camera) {
+  static getClickedObject(x: number, y: number, camera: THREE.Camera): Area | null {
     // Perform precise intersection test
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2(x, y);
