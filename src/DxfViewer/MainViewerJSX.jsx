@@ -98,6 +98,16 @@ const DxfViewerComponent = ({ width, height }) => {
 
     const canvas = viewer.GetCanvas();
     if (canvas) {
+      canvas.addEventListener("mousedown", (e) => {
+        console.log("drag");
+        e.preventDefault();
+        e.stopPropagation();
+      });
+      canvas.addEventListener("dragend", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("dragend");
+      });
       canvas.addEventListener("dragover", (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -109,6 +119,7 @@ const DxfViewerComponent = ({ width, height }) => {
       canvas.addEventListener("drop", (e) => {
         e.preventDefault();
         e.stopPropagation();
+        console.log("drop", FloorBuilder);
         MainViewerUtils.droppedZone(e);
       });
       canvas.addEventListener("click", MainViewerUtils.getClickedMesh);
