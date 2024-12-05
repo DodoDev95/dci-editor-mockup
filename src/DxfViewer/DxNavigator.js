@@ -39,8 +39,15 @@ export class dxNavigator {
         return null;
       }
 
-      if (MainViewerUtils.viewer && !floor.parentArea) {
-        ClippingManipulation.CreateClippingPlane(MainViewerUtils.viewer.GetBounds(), MainViewerUtils.viewer.origin);
+      if (MainViewerUtils.viewer && !floor.parentArea && floor.asset == null) {
+        //separirati pngeve i dxf ovde
+        const bigMesh = ClippingManipulation.CreateClippingPlane(
+          MainViewerUtils.viewer.GetBounds(),
+          MainViewerUtils.viewer.origin
+        );
+        const centerPoint = dxNavigator.getCenterPoint(bigMesh);
+        const meshSize = dxNavigator.getMeshSize(bigMesh);
+        MainViewerUtils.viewer.SetView(centerPoint, meshSize);
       } else {
         //AreaClickable.clearAreas();
         ClippingManipulation.ClippingPlaneClick(floor.parentArea.mesh, floor.parentArea.path);
@@ -53,9 +60,8 @@ export class dxNavigator {
 
         // Set the view to focus on the mesh
         MainViewerUtils.viewer.SetView(centerPoint, meshSize);
-
-        renderer.render(scene, camera);
       }
+      renderer.render(scene, camera);
 
       console.log("Floor has no asset");
     } else {

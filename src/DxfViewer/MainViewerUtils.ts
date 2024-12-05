@@ -30,8 +30,6 @@ export class MainViewerUtils {
   }
 
   static getClickedMesh(event: any, state: any, dispatch: any) {
-
-console.log(state)
     if (state.canvasState.isDrawingMode) {
       const temp = AreaClickable.drawLine(event);
       console.log("dsadplpsda", temp);
@@ -57,8 +55,6 @@ console.log(state)
     const rect = renderer.domElement.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-    console.log(x, y);
-
     const mouse = new THREE.Vector2(x, y);
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, camera);

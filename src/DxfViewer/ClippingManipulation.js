@@ -46,8 +46,7 @@ class ClippingManipulation {
     ClippingManipulation.clippingPlane.shape = shape;
     ClippingManipulation.ViewerBounds = Bounds;
     ClippingManipulation.origin = origin;
-    scene.add(planeMesh);
-    renderer.render(scene, MainViewerUtils.camera);
+    return planeMesh;
   }
 
   static ClippingPlaneClick(clickedMesh, clickedPath) {
