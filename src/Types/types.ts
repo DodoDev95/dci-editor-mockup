@@ -3,13 +3,23 @@
 import { Mesh, Path } from "three";
 
 export interface Floor {
+  name: string;      // Name of the floor
+  parent: number;     // ID of the parent floor (if any)
+  parentArea?: Path;
     id: Number;        // Unique identifier for the floor
       sensors: Sensor[];      // Array of sensors on the floor
-      floors: Floor[];        // Sub-floors or nested floors
+      subFloors: Floor[];        // Sub-floors or nested floors
       asset: any;             // Asset associated with the floor (type 'any' as placeholder)
-      areas: Path[];          // Array of THREE.Path instances representing areas
+
     
 }
+
+// canvasTypes.ts
+export interface CanvasState {
+  isDrawingMode: boolean;
+  parentFloorId: number | null;           // ID of the parent floor (if drawing a subfloor)
+}
+
     
 export interface Sensor {
     id: number;
@@ -24,6 +34,7 @@ export const CREATE_FLOOR = 'CREATE_FLOOR';
 export const ADD_SENSOR = 'ADD_SENSOR';
 export const ADD_AREA = 'ADD_AREA';
 export const ADD_SUBFLOOR = 'ADD_SUBFLOOR';
+export const SET_CURRENT_FLOOR = 'SET_CURRENT_FLOOR';
 // actions.ts
 
 
@@ -58,6 +69,12 @@ interface AddSubFloorAction {
     subFloor: Floor;
   };
 }
+interface setCurrentFloor {
+  type: typeof SET_CURRENT_FLOOR;
+  payload: {
+currentFloor: Floor;
+  };
+}
 
-export type FloorActionTypes = CreateFloorAction | AddSensorAction | AddAreaAction | AddSubFloorAction;
+export type FloorActionTypes = CreateFloorAction | AddSensorAction | AddAreaAction | AddSubFloorAction | setCurrentFloor;
 

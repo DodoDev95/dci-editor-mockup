@@ -45,7 +45,7 @@ export class Floor {
     const shapeMesh = new THREE.Mesh(geometry, material);
 
     // Add the mesh to the scene
-    this.scene.add(shapeMesh);
+    //this.scene.add(shapeMesh);
 
     // Make it clickable
      AreaClickable.addClickableObject({

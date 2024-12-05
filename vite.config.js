@@ -8,9 +8,9 @@ export default defineConfig({
   assetsInclude: ["**/*.dxf"],
   resolve: {
     alias: {
-      "@api": path.resolve(__dirname, "./src/api/*"),
+      "@api": path.resolve(__dirname, "./src/api"),
       "@types": path.resolve(__dirname, "./src/Types/types.ts"),
-      "@assets": path.resolve(__dirname, "./src/assets/*"),
+      "@assets": path.resolve(__dirname, "./src/assets"),
       "@store": path.resolve(__dirname, "./src/api/store.ts"),
     },
   },

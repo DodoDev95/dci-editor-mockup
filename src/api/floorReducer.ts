@@ -1,17 +1,17 @@
 // floorReducer.ts
 
-import { FloorsState, FloorActionTypes, CREATE_FLOOR, ADD_SENSOR, ADD_AREA, ADD_SUBFLOOR } from '@types';
+import { Floor } from '@types';
+import { FloorActionTypes, CREATE_FLOOR, ADD_SUBFLOOR, SET_CURRENT_FLOOR } from './floorActionTypes';
 
-const initialState: FloorsState = {
+const initialState: any = {
   floors: {},
-  sensors: {},
-  areas: {},
+  currentFloor: null,
 };
 
 export function floorReducer(
   state = initialState,
   action: FloorActionTypes
-): FloorsState {
+): any {
   switch (action.type) {
     case CREATE_FLOOR: {
       const { floor } = action.payload;
@@ -19,83 +19,42 @@ export function floorReducer(
         ...state,
         floors: {
           ...state.floors,
-          [floor.id]: {
-            ...floor,
-            sensors: [],
-            areas: [],
-            subFloors: [],
-          },
+          [floor.id]: { ...floor, subFloors: [] },
         },
       };
     }
-    case ADD_SENSOR: {
-      const { sensor } = action.payload;
-      const floor = state.floors[sensor.floorId];
-      if (!floor) {
-        console.error(`Floor ${sensor.floorId} not found`);
-        return state;
-      }
-      return {
-        ...state,
-        sensors: {
-          ...state.sensors,
-          [sensor.id]: sensor,
-        },
-        floors: {
-          ...state.floors,
-          [sensor.floorId]: {
-            ...floor,
-            sensors: [...floor.sensors, sensor.id],
-          },
-        },
-      };
-    }
-    case ADD_AREA: {
-      const { area } = action.payload;
-      const floor = state.floors[area.floorId];
-      if (!floor) {
-        console.error(`Floor ${area.floorId} not found`);
-        return state;
-      }
-      return {
-        ...state,
-        areas: {
-          ...state.areas,
-          [area.id]: area,
-        },
-        floors: {
-          ...state.floors,
-          [area.floorId]: {
-            ...floor,
-            areas: [...floor.areas, area.id],
-          },
-        },
-      };
-    }
+    
     case ADD_SUBFLOOR: {
+      console.log("ADDING SUBFLOOR", action);
       const { parentFloorId, subFloor } = action.payload;
-      const parentFloor = state.floors[parentFloorId];
+      const parentFloor = state.floors[state.currentFloor.id];
       if (!parentFloor) {
         console.error(`Parent floor ${parentFloorId} not found`);
         return state;
       }
+      const updatedParentFloor = {
+        ...parentFloor,
+        subFloors: [...parentFloor.subFloors, subFloor.id],
+      };
       return {
         ...state,
         floors: {
           ...state.floors,
-          [subFloor.id]: {
-            ...subFloor,
-            sensors: [],
-            areas: [],
-            subFloors: [],
-          },
-          [parentFloorId]: {
-            ...parentFloor,
-            subFloors: [...parentFloor.subFloors, subFloor.id],
-          },
+          [state.currentFloor.id]: updatedParentFloor,
+          [subFloor.id]: { ...subFloor, subFloors: [] },
         },
       };
     }
+    
+    case SET_CURRENT_FLOOR: {
+      console.log(action.payload);
+      const { currentFloor } = action.payload;
+      return {
+        ...state,
+        currentFloor,
+      };
+    }
+    
     default:
       return state;
   }

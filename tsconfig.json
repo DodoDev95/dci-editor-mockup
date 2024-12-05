@@ -1,6 +1,14 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@api/*": ["src/api/*"],
+      "@types": ["src/Types/types.ts"],
+      "@assets/*": ["src/assets/*"],
+      "@store": ["src/api/store.ts"],
+    },
     "typeRoots": ["node_modules/@types"],
     "types": ["react", "react-dom"]
   }
 }
+

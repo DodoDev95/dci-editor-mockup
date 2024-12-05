@@ -1,15 +1,23 @@
 import * as THREE from "three";
 import AreaClickable from "./AreaClass";
 import ClippingManipulation from "./ClippingManipulation";
+import { setCurrentFloor } from "@api/floorActionTypes";
+import { TURN_OFF_DRAWING_MODE } from "@api/canvasActionTypes";
+import { store } from "@store";
+import { addSubFloor, createFloor } from "@api/floorActionTypes";
+import { dxNavigator } from "./DxNavigator";
+import { DxfViewer } from "dxf-viewer";
+
+
 
 export class MainViewerUtils {
-  static viewer = null;
-  static camera = null;
-  static scene = null;
-  static renderer = null;
+  static viewer: DxfViewer | null = null;
+  static camera: THREE.Camera | null = null;
+  static scene: THREE.Scene | null = null;
+  static renderer: THREE.WebGLRenderer | null = null;
 
-  static initialize(viewerRef) {
-    const viewer = viewerRef.current;
+  static initialize(viewerRef: any) {
+    const viewer = viewerRef.current as Viewer;
     if (!viewer) {
       console.error("Viewer not found!");
       return null;
@@ -21,7 +29,23 @@ export class MainViewerUtils {
     MainViewerUtils.scene = viewer.GetScene();
   }
 
-  static getClickedMesh(event) {
+  static getClickedMesh(event: any, state: any, dispatch: any) {
+
+console.log(state)
+    if (state.canvasState.isDrawingMode) {
+      const temp = AreaClickable.drawLine(event);
+      console.log("dsadplpsda", temp);
+      if (temp) {
+        const floor = { ...state.canvasState.floor, parentArea: temp };
+
+        dispatch({ type: TURN_OFF_DRAWING_MODE, payload: { floor } });
+        dispatch(addSubFloor(0, floor));
+        dispatch(createFloor(floor));
+
+        return temp;
+      }
+      return null;
+    }
     const renderer = MainViewerUtils.renderer;
     const camera = MainViewerUtils.camera;
     const scene = MainViewerUtils.scene;
@@ -41,17 +65,22 @@ export class MainViewerUtils {
     const clickedObject = AreaClickable.getClickedObject(x, y, camera);
 
     if (clickedObject) {
-      ClippingManipulation.CreateClippingPlane(MainViewerUtils.viewer.GetBounds(), MainViewerUtils.viewer.origin);
-      ClippingManipulation.ClippingPlaneClick(clickedObject.mesh, clickedObject.path);
+      dxNavigator.navigateTo(state.floorState.floors[clickedObject.id]);
     }
 
     return clickedObject;
   }
-  static droppedZone(event, dispatch, floorState) {
+
+  static droppedZone(event: any, dispatch: any, floorState: any) {
     event.preventDefault();
     event.stopPropagation();
 
     const { scene, renderer, camera } = MainViewerUtils;
+
+    if (!renderer || !camera || !scene) {
+      console.error("Renderer, camera, or scene not found!");
+      return;
+    }
 
     // Get mouse position in normalized device coordinates (-1 to +1)
     const rect = renderer.domElement.getBoundingClientRect();
@@ -64,7 +93,7 @@ export class MainViewerUtils {
 
     // Intersect with clickable objects (areas)
     const intersects = raycaster.intersectObjects(
-      AreaClickable.array.map((item) => item.mesh),
+      AreaClickable.array.map((item: any) => item.mesh),
       true
     );
 
@@ -73,7 +102,7 @@ export class MainViewerUtils {
       const clickedMesh = intersect.object;
 
       // Find the area that was clicked
-      const clickableObject = AreaClickable.array.find((item) => item.mesh === clickedMesh);
+      const clickableObject = AreaClickable.array.find((item: any) => item.mesh === clickedMesh);
       if (clickableObject) {
         const areaId = clickableObject.areaId;
         const area = floorState.areas[areaId];
@@ -91,9 +120,6 @@ export class MainViewerUtils {
           label: "Dropped Sensor",
           floorId: floorId,
         };
-
-        // Dispatch action to add the sensor
-        dispatch({ type: ADD_SENSOR, payload: { sensor } });
 
         // Optionally, add visual representation of the sensor
         const sensorGeometry = new THREE.SphereGeometry(100, 16, 16);
